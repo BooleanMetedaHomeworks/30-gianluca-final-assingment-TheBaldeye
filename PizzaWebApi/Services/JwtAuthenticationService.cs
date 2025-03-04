@@ -60,7 +60,7 @@ namespace PizzaWebApi.Services
         // 4. Generare e firmare il token JWT
         // 5. Restituire null se l'autenticazione fallisce
 
-        /* SCEGLI TRA:
+        /*SCEGLI TRA:
         A)
         public async Task<string> Authenticate(string email, string password)
         {
@@ -76,9 +76,9 @@ namespace PizzaWebApi.Services
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<string> Authenticate(string email, string password)
         {
             var user = await _userService.AuthenticateAsync(email, password);
@@ -105,7 +105,7 @@ namespace PizzaWebApi.Services
             return tokenHandler.WriteToken(token);
         }
 
-        C)
+        /*C)
         public async Task<string> Authenticate(string email, string password)
         {
             if (email == "admin" && password == "admin")
@@ -117,11 +117,12 @@ namespace PizzaWebApi.Services
         // SEZIONE DA COMPLETARE (20%)
         // Obiettivo: Aggiungere logging per tracciare i tentativi di autenticazione
         // Tips:
-        // 1. Usa ILogger per registrare i tentativi di login
+        // 1. Usa ICustomLogger per registrare i tentativi di login
         // 2. Logga sia i tentativi riusciti che quelli falliti
         // 3. Non loggare mai le password!
         // 4. Includi informazioni utili come email e timestamp
 
         // Il tuo codice qui...
+
     }
 }

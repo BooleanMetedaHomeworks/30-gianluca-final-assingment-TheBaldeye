@@ -64,9 +64,9 @@ namespace PizzaWebApi.Controllers
         public async Task<IActionResult> Create([FromBody] Pizza newPizza)
         {
             return Ok(await _pizzaRepository.InsertPizza(newPizza));
-        }
+        }*/
 
-        B)
+        //B)
         [HttpPost]
         [Authorize(Roles = "SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Create([FromBody] Pizza newPizza)
@@ -87,7 +87,7 @@ namespace PizzaWebApi.Controllers
             }
         }
 
-        C)
+        /*C)
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Create(Pizza newPizza)
@@ -108,7 +108,7 @@ namespace PizzaWebApi.Controllers
         // 4. Tutti gli errori devono essere gestiti
 
         /* SCEGLI TRA:
-        A)
+        A)*/
         [HttpPut("{id}")]
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Update(int id, [FromBody] Pizza newPizza)
@@ -132,7 +132,7 @@ namespace PizzaWebApi.Controllers
             }
         }
 
-        B)
+        /*B)
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, Pizza newPizza)
         {
@@ -181,5 +181,26 @@ namespace PizzaWebApi.Controllers
         //    In questo caso, restituisci NotFound()
 
         // Il tuo codice qui...
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                if (ModelState.IsValid == false)
+                {
+                    return BadRequest(ModelState.Values);
+                }
+                var affectedRows = await _pizzaRepository.DeletePizza(id);
+                if (affectedRows == 0)
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

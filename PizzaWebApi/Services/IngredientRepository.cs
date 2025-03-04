@@ -54,7 +54,7 @@ namespace PizzaWebApi
         // 2. Deve usare parametri SQL per sicurezza
         // 3. Deve gestire il caso in cui l'ingrediente non esiste
 
-        /* SCEGLI TRA:
+        /*SCEGLI TRA:
         A)
         public async Task<Ingredient> GetIngredientById(int id)
         {
@@ -70,9 +70,9 @@ namespace PizzaWebApi
                 }
             }
             return null;
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<Ingredient> GetIngredientById(int id)
         {
             var query = @"SELECT TOP 1 * FROM Ingredients WHERE Id = @id";
@@ -92,7 +92,7 @@ namespace PizzaWebApi
             return null;
         }
 
-        C)
+        /*C)
         public async Task<Ingredient> GetIngredientById(int id)
         {
             return (await GetAllIngredients()).FirstOrDefault(i => i.Id == id);
@@ -128,9 +128,9 @@ namespace PizzaWebApi
             if (index != -1)
                 ingredients[index] = ingredient;
             return 1;
-        }
+        }*/
 
-        C)
+        //C)
         public async Task<int> UpdateIngredient(int id, Ingredient ingredient)
         {
             using var conn = new SqlConnection(CONNECTION_STRING);
@@ -143,7 +143,6 @@ namespace PizzaWebApi
                 return await cmd.ExecuteNonQueryAsync();
             }
         }
-        */
 
         // SEZIONE DA COMPLETARE (20%)
         // Obiettivo: Implementare l'eliminazione di un ingrediente e le sue relazioni
@@ -155,6 +154,30 @@ namespace PizzaWebApi
         // 5. Ricorda di gestire la connessione con using
 
         // Il tuo codice qui...
+        public async Task<bool> DeleteIngredient(int id)
+        {
+            var clearedRelations = await ClearPostIngredients(id);
+
+            if (clearedRelations > 0)
+            {
+                using var conn = new SqlConnection(CONNECTION_STRING);
+                await conn.OpenAsync();
+
+                var query = "DELETE FROM Ingredients WHERE Id = @id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    return rowsAffected > 0;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         // Metodo helper che converte una riga del database in un oggetto Ingredient
         private Ingredient GetIngredientFromData(SqlDataReader reader)

@@ -62,9 +62,9 @@ namespace PizzaWebApi
             using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
             // ... resto del codice
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<List<Category>> GetCategoriesByName(string name)
         {
             var query = @"SELECT * FROM Categories WHERE Name=@name";
@@ -85,7 +85,7 @@ namespace PizzaWebApi
             return Categories;
         }
 
-        C)
+        /*C)
         public List<Category> GetCategoriesByName(string name)
         {
             return GetAllCategories().Result.Where(c => c.Name == name).ToList();
@@ -110,9 +110,9 @@ namespace PizzaWebApi
             {
                 return await cmd.ExecuteNonQueryAsync();
             }
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<int> InsertCategory(Category Category)
         {
             using var conn = new SqlConnection(CONNECTION_STRING);
@@ -125,7 +125,7 @@ namespace PizzaWebApi
             }
         }
 
-        C)
+        /*C)
         public async Task<int> InsertCategory(Category Category)
         {
             var categories = await GetAllCategories();
@@ -143,5 +143,12 @@ namespace PizzaWebApi
         // 4. Crea e restituisci un nuovo oggetto Category con i dati letti
 
         // Il tuo codice qui...
+        private Category GetCategoryFromData(SqlDataReader reader)
+        {
+            int id = reader.GetInt32(reader.GetOrdinal("id"));
+            string name = reader.GetString(reader.GetOrdinal("name"));
+            var Category = new Category(id, name);
+            return Category;
+        }
     }
 }

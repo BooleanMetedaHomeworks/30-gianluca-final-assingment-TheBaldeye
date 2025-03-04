@@ -30,13 +30,13 @@ namespace PizzaWebApi.Models
 
         /* SCEGLI TRA:
         A)
-        public int Price { get; set; }
+        public int Price { get; set; }*/
         
         B)
         [Range(0.1, 10000)]
         public decimal Price { get; set; }
         
-        C)
+        /*C)
         [Required]
         public double Price { get; set; }
         */
@@ -50,13 +50,13 @@ namespace PizzaWebApi.Models
         /* SCEGLI TRA:
         A)
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Category Category { get; set; }*/
         
-        B)
+        //B)
         public int? CategoryId { get; set; }
         public Category? Category { get; set; }
         
-        C)
+        /*C)
         [Required]
         public int CategoryId { get; set; }
         [Required]
@@ -71,6 +71,8 @@ namespace PizzaWebApi.Models
         // 3. Le liste devono essere inizializzate nel costruttore
 
         // Il tuo codice qui...
+        public List<int> IngredientIds { get; set; } = new List<int>();
+        public List<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 
         // SEZIONE COMPLETA - COSTRUTTORI
         // Questi costruttori mostrano diversi modi di creare una pizza

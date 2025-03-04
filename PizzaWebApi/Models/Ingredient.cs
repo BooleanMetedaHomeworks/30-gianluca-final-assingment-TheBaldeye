@@ -12,30 +12,31 @@
 
         // Il nome dell'ingrediente, ad esempio "Mozzarella"
         public string Name { get; set; }
+
+
+        // QUIZ (50%): Quali costruttori sono necessari per la classe Ingredient?
+        // Obiettivo: Implementare i costruttori necessari per creare ingredienti
+        // Processo logico:
+        // 1. Considera quando serve creare un ingrediente vuoto
+        // 2. Considera quando serve creare un ingrediente con tutti i dati
+
+        /* SCEGLI TRA:
+        A)
+        public Ingredient(string name) 
+        {
+            Name = name;
+        }*/
+
+        //B)
+        public Ingredient() { }
+        public Ingredient(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 
-    // QUIZ (50%): Quali costruttori sono necessari per la classe Ingredient?
-    // Obiettivo: Implementare i costruttori necessari per creare ingredienti
-    // Processo logico:
-    // 1. Considera quando serve creare un ingrediente vuoto
-    // 2. Considera quando serve creare un ingrediente con tutti i dati
-
-    /* SCEGLI TRA:
-    A)
-    public Ingredient(string name) 
-    {
-        Name = name;
-    }
-
-    B)
-    public Ingredient() { }
-    public Ingredient(int id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
-    C)
+    /*C)
     public Ingredient(int id)
     {
         Id = id;

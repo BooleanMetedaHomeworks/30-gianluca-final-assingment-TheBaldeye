@@ -72,9 +72,9 @@ namespace PizzaWebApi.Controllers
         {
             var ingredient = await _ingredientRepository.GetIngredientById(id);
             return Ok(ingredient);
-        }
+        }*/
 
-        B)
+        //B)
         // Implementazione corretta:
         // - Gestisce il caso di ingrediente non trovato (404)
         // - Gestisce gli errori in modo appropriato
@@ -95,7 +95,7 @@ namespace PizzaWebApi.Controllers
             }
         }
 
-        C)
+        /*C)
         // Implementazione problematica:
         // - Routing non corretto (manca il parametro nell'URL)
         // - Non gestisce gli errori
@@ -113,8 +113,8 @@ namespace PizzaWebApi.Controllers
         // 2. Validare i dati ricevuti
         // 3. Gestire il caso di ingrediente non trovato
 
-        /* SCEGLI TRA:
-        A)
+        /*SCEGLI TRA:
+        A)*/
         // Implementazione corretta:
         // - Autorizzazione appropriata
         // - Validazione del modello
@@ -142,7 +142,7 @@ namespace PizzaWebApi.Controllers
             }
         }
 
-        B)
+        /*B)
         // Implementazione insufficiente:
         // - Manca l'autorizzazione
         // - Non valida i dati
@@ -202,5 +202,28 @@ namespace PizzaWebApi.Controllers
         // 7. Gestisci gli errori con try-catch
 
         // Il tuo codice qui...
+        [HttpPost("{id}")]
+        [Authorize(Roles = "SUPERVISOR, ADMIN")]
+        public async Task<IActionResult> Create([FromBody] Ingredient newIngredient)
+        {
+            try
+            {               
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState.Values);
+                }
+                
+                newIngredient.Id = 0;
+
+                var result = await _ingredientRepository.InsertIngredient(newIngredient);
+
+                return Created($"/{ControllerContext.ActionDescriptor.ControllerName}/{newIngredient.Id}", newIngredient);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
     }
 }

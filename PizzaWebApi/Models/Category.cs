@@ -12,7 +12,7 @@
 
         // Il nome della categoria, ad esempio "Pizze Classiche"
         public string Name { get; set; }
-    }
+    
 
     // QUIZ (50%): Come implementeresti i costruttori della classe Category?
     // Obiettivo: Fornire modi flessibili per creare categorie
@@ -28,14 +28,14 @@
     public Category(string name) 
     {
         Name = name;
-    }
+    }*/
 
-    C)
-    public Category() { }
-    public Category(int id, string name)
-    {
-        Id = id;
-        Name = name;
+    //C)
+        public Category() { }
+        public Category(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
-    */
 }

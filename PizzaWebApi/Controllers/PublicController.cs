@@ -54,9 +54,9 @@ namespace PizzaWebApi.Controllers
         {
             var pizza = _pizzaRepository.GetPizzaById(id);
             return Ok(pizza);
-        }
+        }*/
 
-        B)
+        //B)
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -73,7 +73,7 @@ namespace PizzaWebApi.Controllers
             }
         }
 
-        C)
+        /*C)
         [HttpGet("GetPizza")]
         public async Task<IActionResult> GetById([FromQuery] int id)
         {
@@ -95,9 +95,9 @@ namespace PizzaWebApi.Controllers
         public async Task<IActionResult> Search(string name)
         {
             return Ok(await _pizzaRepository.GetPizzasByName(name));
-        }
+        }*/
 
-        B)
+        //B)
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] string name)
         {
@@ -112,7 +112,7 @@ namespace PizzaWebApi.Controllers
             }
         }
 
-        C)
+        /*C)
         [HttpGet("search")]
         public IActionResult Search(string name)
         {

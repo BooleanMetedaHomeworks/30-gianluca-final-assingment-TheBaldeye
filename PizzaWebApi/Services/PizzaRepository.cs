@@ -81,9 +81,9 @@ namespace PizzaWebApi
                 }
             }
             return Pizzas.Values.ToList();
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<List<Pizza>> GetPizzasByName(string name)
         {
             var query = @"SELECT p.*, c.Id AS CategoryId, c.Name AS CategoryName, 
@@ -110,7 +110,7 @@ namespace PizzaWebApi
             return Pizzas.Values.ToList();
         }
 
-        C)
+        /*C)
         public async Task<List<Pizza>> GetPizzasByName(string name)
         {
             return (await GetAllPizzas()).Where(p => p.Name.Contains(name)).ToList();
@@ -124,7 +124,7 @@ namespace PizzaWebApi
         // 2. Recuperare l'ID della pizza appena inserita
         // 3. Inserire le relazioni con gli ingredienti
 
-        /* SCEGLI TRA:
+        /*SCEGLI TRA:
         A)
         public async Task<int> InsertPizza(Pizza pizza)
         {
@@ -138,9 +138,9 @@ namespace PizzaWebApi
                 cmd.Parameters.Add(new SqlParameter("@price", pizza.Price));
                 return await cmd.ExecuteNonQueryAsync();
             }
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<int> InsertPizza(Pizza pizza)
         {
             using var conn = new SqlConnection(CONNECTION_STRING);
@@ -160,7 +160,7 @@ namespace PizzaWebApi
             }
         }
 
-        C)
+        /*C)
         public async Task<int> InsertPizza(Pizza pizza)
         {
             var pizzas = await GetAllPizzas();
@@ -180,6 +180,47 @@ namespace PizzaWebApi
         // 4. Devi gestire anche gli ingredienti (usa HandleIngredients)
         // 5. Restituisci il numero di righe modificate
 
-        // Il tuo codice qui...
+        // Il tuo codice qui...       
+        public async Task<int> UpdatePizza(Pizza pizza)
+        {
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+            var query = "UPDATE Pizzas SET Name = @name, Description = @description, Price = @price, CategoryId = @categoryId WHERE Id = @Id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@name", pizza.Name));
+                cmd.Parameters.Add(new SqlParameter("@description", pizza.Description));
+                cmd.Parameters.Add(new SqlParameter("@price", pizza.Price));
+                cmd.Parameters.Add(new SqlParameter("@categoryId", pizza.CategoryId ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@Id", pizza.Id));
+                
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                await HandleIngredients(pizza.IngredientIds, pizza.Id, conn);
+                
+                return rowsAffected;
+            }
+        }
+
+        private async Task HandleIngredients(List<int> ingredientIds, int pizzaId, SqlConnection conn)
+        {
+            var deleteQuery = "DELETE FROM PizzaIngredient WHERE PizzaId = @pizzaId";
+            using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn))
+            {
+                deleteCmd.Parameters.Add(new SqlParameter("@pizzaId", pizzaId));
+                await deleteCmd.ExecuteNonQueryAsync();
+            }
+
+            var insertQuery = "INSERT INTO PizzaIngredient (PizzaId, IngredientId) VALUES (@pizzaId, @ingredientId)";
+            foreach (var ingredientId in ingredientIds)
+            {
+                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                {
+                    insertCmd.Parameters.Add(new SqlParameter("@pizzaId", pizzaId));
+                    insertCmd.Parameters.Add(new SqlParameter("@ingredientId", ingredientId));
+                    await insertCmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
     }
 }

@@ -42,16 +42,16 @@ namespace PizzaWebApi.Controllers
         // 2. Verifica le credenziali e genera un token
         // 3. Restituisci il token con la sua scadenza
 
-        /* SCEGLI TRA:
+        /*SCEGLI TRA:
         A)
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] UserModel user)
         {
             var token = await _jwt.Authenticate(user.Email, user.Password);
             return Ok(new { Token = token });
-        }
+        }*/
 
-        B)
+        //B)
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] UserModel user)
         {
@@ -67,7 +67,7 @@ namespace PizzaWebApi.Controllers
             });
         }
 
-        C)
+        /*C)
         [HttpPost("Login")]
         public IActionResult Login([FromBody] UserModel user)
         {
@@ -75,14 +75,14 @@ namespace PizzaWebApi.Controllers
                 return Ok(new { Token = "token123" });
             return Unauthorized();
         }
-        */
+        
 
         // QUIZ 2 (25%): Come gestiresti la verifica del token?
         // Obiettivo: Creare un endpoint che verifica se il token è valido
         // Processo logico:
         // 1. L'endpoint deve essere protetto (solo utenti autenticati)
         // 2. Deve verificare l'identità dell'utente
-        // 3. Deve restituire informazioni sull'utente corrente
+        // 3. Deve restituire informazioni sull'utente corrente*/
 
         /* SCEGLI TRA:
         A)
@@ -90,9 +90,9 @@ namespace PizzaWebApi.Controllers
         public IActionResult Verify()
         {
             return Ok("Token valido");
-        }
+        }*/
 
-        B)
+        //B)
         [HttpGet("Verify")]
         [Authorize]
         public IActionResult Verify()
@@ -104,15 +104,15 @@ namespace PizzaWebApi.Controllers
             });
         }
 
-        C)
+        /*C)
         [HttpGet("Verify")]
         public async Task<IActionResult> Verify([FromHeader] string token)
         {
             if (string.IsNullOrEmpty(token))
                 return Unauthorized();
             return Ok();
-        }
-        */
+        }*/
+
 
         // SEZIONE DA COMPLETARE (20%)
         // Obiettivo: Implementare l'endpoint di logout
@@ -123,5 +123,11 @@ namespace PizzaWebApi.Controllers
         // 4. Restituisci un messaggio di successo
 
         // Il tuo codice qui...
+        [HttpPost("Logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout([FromBody] UserModel user)
+        {
+            return Ok(new { message = "Logout effettuato." });
+        }
     }
 }

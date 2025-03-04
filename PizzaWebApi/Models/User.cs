@@ -31,9 +31,9 @@
     {
         public string Email { get; set; }
         public string Password { get; set; }
-    }
+    }*/
 
-    B)
+    //B)
     public class User
     {
         public int Id { get; set; }
@@ -41,7 +41,7 @@
         public string PasswordHash { get; set; }
     }
 
-    C)
+    /*C)
     public class User
     {
         public int Id { get; set; }
