@@ -21,6 +21,17 @@ namespace PizzaWebApi
             // di gestire le richieste HTTP attraverso i controller che creeremo
             builder.Services.AddControllers();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("DefaultCORS", builder =>
+                {
+                    // Aperto a tutto!
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
             // Configurazione del sistema di autenticazione JWT
             // JWT (JSON Web Token) è un sistema che permette agli utenti di autenticarsi
             // e mantenere la loro sessione attraverso un token
@@ -93,6 +104,7 @@ namespace PizzaWebApi
             // Questi controllano che l'utente sia autenticato e abbia i permessi necessari
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCors("DefaultCORS");
 
             // Configura il routing per i controller
             app.MapControllers();

@@ -49,9 +49,17 @@ namespace PizzaWebApi.Services
             // Quarto passo: eseguiamo la query usando parametri per prevenire SQL injection
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                cmd.Parameters.Add(new SqlParameter("@Email", user.Email));
-                cmd.Parameters.Add(new SqlParameter("@PasswordHash", passwordHash));
-                return await cmd.ExecuteNonQueryAsync() > 0;
+                try
+                {
+                    cmd.Parameters.Add(new SqlParameter("@Email", user.Email));
+                    cmd.Parameters.Add(new SqlParameter("@PasswordHash", passwordHash));
+                    return await cmd.ExecuteNonQueryAsync() > 0;
+                }
+                catch (Exception ex) {
+                    return false;
+                }
+
+                
             }
         }
 
@@ -76,9 +84,9 @@ namespace PizzaWebApi.Services
             if (await reader.ReadAsync())
                 return new User { Id = reader.GetInt32(0), Email = email };
             return null;
-        }
+        }*/
 
-        B)
+        //B)
         public async Task<User> AuthenticateAsync(string email, string password)
         {
             var query = "SELECT * FROM Users WHERE Email = @Email";
@@ -100,7 +108,7 @@ namespace PizzaWebApi.Services
             return null;
         }
 
-        C)
+        /*C)
         public Task<User> AuthenticateAsync(string email, string password)
         {
             if (email == "admin@admin.com" && password == "admin")
@@ -141,9 +149,9 @@ namespace PizzaWebApi.Services
                 }
             }
             return roles;
-        }
+        }*/
 
-        C)
+        //C)
         public async Task<IEnumerable<string>> GetUserRolesAsync(int userId)
         {
             var roles = new List<string>();
@@ -162,7 +170,7 @@ namespace PizzaWebApi.Services
             }
             return roles;
         }
-        */
+
 
         // SEZIONE DA COMPLETARE (20%)
         // Obiettivo: Implementare un metodo per verificare se un'email è già registrata
@@ -173,5 +181,17 @@ namespace PizzaWebApi.Services
         // 4. Restituisci true se l'email esiste già, false altrimenti
 
         // Il tuo codice qui...
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+            var query = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@Email", email));
+                var count = (int)await cmd.ExecuteScalarAsync();
+                return count > 0;
+            }
+        }
     }
 }

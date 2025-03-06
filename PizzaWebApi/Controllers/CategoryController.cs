@@ -8,7 +8,7 @@ namespace PizzaWebApi.Controllers
     // Questo è un Controller API che gestisce tutte le operazioni relative alle categorie
     [ApiController]  // Indica che questa classe è un controller API
     [Route("[controller]")]  // Il routing sarà basato sul nome del controller (es: /Category/...)
-    [Authorize]  // Richiede che l'utente sia autenticato per accedere a questi endpoint
+    //[Authorize]  // Richiede che l'utente sia autenticato per accedere a questi endpoint
     public class CategoryController : ControllerBase
     {
         // Repository è la classe che si occupa di accedere ai dati nel database
@@ -22,7 +22,7 @@ namespace PizzaWebApi.Controllers
 
         // Endpoint GET che restituisce tutte le categorie o filtra per nome
         [HttpGet]
-        [Authorize(Roles = "REGULAR,SUPERVISOR,ADMIN")]
+        //[Authorize(Roles = "REGULAR,SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Get(string? name)
         {
             try
@@ -95,7 +95,7 @@ namespace PizzaWebApi.Controllers
 
         //B)
         [HttpPost]
-        [Authorize(Roles = "SUPERVISOR,ADMIN")]
+        //[Authorize(Roles = "SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Create([FromBody] Category newCategory)
         {
             try
@@ -133,7 +133,7 @@ namespace PizzaWebApi.Controllers
 
         // Il tuo codice qui...
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteById(int id)
         {
             try

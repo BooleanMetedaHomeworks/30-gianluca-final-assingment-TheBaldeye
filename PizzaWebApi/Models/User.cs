@@ -1,4 +1,6 @@
-﻿namespace PizzaWebApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PizzaWebApi.Models
 {
     // SEZIONE COMPLETA (50%)
     // ========== MODELLI UTENTE ==========
@@ -12,6 +14,7 @@
     public class UserModel
     {
         // Email dell'utente - sarà usata come username per il login
+        [EmailAddress]
         public string Email { get; set; }
 
         // Password dell'utente - viene usata solo durante login/registrazione

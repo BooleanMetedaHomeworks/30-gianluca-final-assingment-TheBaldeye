@@ -11,7 +11,7 @@ namespace PizzaWebApi.Controllers
     // Inoltre, alcuni endpoint sono ulteriormente protetti da autorizzazione basata su ruoli
     [ApiController]  // Indica che questa classe è un controller API e abilita automaticamente alcune funzionalità
     [Route("[controller]")]  // Definisce il percorso base per tutte le richieste (es: /Pizza/...)
-    [Authorize]  // Richiede che l'utente sia autenticato per TUTTI gli endpoint di questo controller
+   // [Authorize]  // Richiede che l'utente sia autenticato per TUTTI gli endpoint di questo controller
     public class PizzaController : ControllerBase
     {
         // Il repository è la classe che si occupa di tutte le operazioni sul database
@@ -31,7 +31,7 @@ namespace PizzaWebApi.Controllers
         // 2. Filtrare le pizze per nome se viene fornito il parametro 'name'
         // È accessibile a utenti REGULAR, SUPERVISOR e ADMIN
         [HttpGet]  // Risponde alle richieste HTTP GET
-        [Authorize(Roles = "REGULAR,SUPERVISOR,ADMIN")]  // Specifica quali ruoli possono accedere
+       // [Authorize(Roles = "REGULAR,SUPERVISOR,ADMIN")]  // Specifica quali ruoli possono accedere
         public async Task<IActionResult> Get(string? name)  // Il '?' indica che name è opzionale
         {
             try
@@ -68,7 +68,7 @@ namespace PizzaWebApi.Controllers
 
         //B)
         [HttpPost]
-        [Authorize(Roles = "SUPERVISOR,ADMIN")]
+        //[Authorize(Roles = "SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Create([FromBody] Pizza newPizza)
         {
             try
@@ -110,7 +110,7 @@ namespace PizzaWebApi.Controllers
         /* SCEGLI TRA:
         A)*/
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Update(int id, [FromBody] Pizza newPizza)
         {
             try
@@ -119,7 +119,7 @@ namespace PizzaWebApi.Controllers
                 {
                     return BadRequest(ModelState.Values);
                 }
-                var affectedRows = await _pizzaRepository.UpdatePizza(id, newPizza);
+                var affectedRows = await _pizzaRepository.UpdatePizza(newPizza);
                 if (affectedRows == 0)
                 {
                     return NotFound();
@@ -182,13 +182,13 @@ namespace PizzaWebApi.Controllers
 
         // Il tuo codice qui...
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var affectedRows = await _pizzaRepository.DeletePizza(id);
-                if (affectedRows == 0)
+                if (affectedRows == false)
                     return NotFound();
                 return Ok(new { DeletedPizzas = affectedRows });
             }

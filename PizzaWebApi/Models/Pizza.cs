@@ -32,7 +32,7 @@ namespace PizzaWebApi.Models
         A)
         public int Price { get; set; }*/
         
-        B)
+        //B)
         [Range(0.1, 10000)]
         public decimal Price { get; set; }
         
@@ -78,18 +78,17 @@ namespace PizzaWebApi.Models
         // Questi costruttori mostrano diversi modi di creare una pizza
         public Pizza()
         {
-            // Inizializza le liste vuote quando viene creata una nuova pizza
             IngredientIds = new List<int>();
             Ingredients = new List<Ingredient>();
         }
 
         public Pizza(int id, string name, string description, decimal price)
-            : this(name, description, price)  // Chiama l'altro costruttore
+            : this(name, description, price) 
         {
             Id = id;
         }
 
-        public Pizza(string name, string description, decimal price) : this()  // Chiama il costruttore base
+        public Pizza(string name, string description, decimal price) : this() 
         {
             Name = name;
             Description = description;

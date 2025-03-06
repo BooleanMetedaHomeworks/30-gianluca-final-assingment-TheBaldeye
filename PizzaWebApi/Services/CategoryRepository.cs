@@ -150,5 +150,53 @@ namespace PizzaWebApi
             var Category = new Category(id, name);
             return Category;
         }
+
+        //Task aggiuntivi per risolvere errori nel codice
+
+        //Aggiunto Get per l'Id Categoria
+        public async Task<Category> GetCategoryById(int id)
+        {
+            var query = @"SELECT TOP 1 * FROM Categories WHERE Id = @id";
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@id", id));
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return GetCategoryFromData(reader);
+                    }
+                }
+            }
+            return null;
+        }
+
+        //Aggiunta Delete per  Id Categoria
+        public async Task<bool> DeleteCategoryById(int id)
+        {
+            var clearedRelations = await _pizzaRepo.ClearCategoryRelations(id);
+
+            if (clearedRelations > 0)
+            {
+                using var conn = new SqlConnection(CONNECTION_STRING);
+                await conn.OpenAsync();
+
+                var query = "DELETE FROM Categories WHERE Id = @id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    return rowsAffected > 0;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

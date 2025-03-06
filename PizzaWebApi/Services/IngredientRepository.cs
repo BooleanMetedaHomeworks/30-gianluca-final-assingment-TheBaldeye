@@ -179,7 +179,9 @@ namespace PizzaWebApi
             }
         }
 
-        // Metodo helper che converte una riga del database in un oggetto Ingredient
+        //Task aggiuntivi per risolvere errori nel codice
+
+        //Aggiunto GetIngredientFromData
         private Ingredient GetIngredientFromData(SqlDataReader reader)
         {
             var id = reader.GetInt32(reader.GetOrdinal("id"));
@@ -188,7 +190,7 @@ namespace PizzaWebApi
             return ingredient;
         }
 
-        // Metodo helper che rimuove tutte le relazioni di un ingrediente
+        //Aggiunto ClearPostIngredients
         private async Task<int> ClearPostIngredients(int id)
         {
             using var conn = new SqlConnection(CONNECTION_STRING);
@@ -198,6 +200,19 @@ namespace PizzaWebApi
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 cmd.Parameters.Add(new SqlParameter("@id", id));
+                return await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        //Aggiunto InsertIngredient
+        public async Task<int> InsertIngredient(Ingredient newIngredient)
+        {
+            using var conn = new SqlConnection(IngredientRepository.CONNECTION_STRING);
+            await conn.OpenAsync();
+            var query = $"INSERT INTO Categories (Id) VALUES (@Id)";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@Id", newIngredient.Id));
                 return await cmd.ExecuteNonQueryAsync();
             }
         }

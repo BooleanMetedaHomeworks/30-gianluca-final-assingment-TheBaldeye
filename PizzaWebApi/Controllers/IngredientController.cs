@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PizzaWebApi.Models;
 
@@ -14,7 +15,7 @@ namespace PizzaWebApi.Controllers
     // - Rimuovere ingredienti non più utilizzati
     [ApiController]  // Abilita comportamenti specifici per le API (come la validazione automatica del modello)
     [Route("[controller]")]  // Il routing sarà basato sul nome del controller, es: /Ingredient/...
-    [Authorize]  // Tutti gli endpoint richiedono un utente autenticato
+    //[Authorize]  // Tutti gli endpoint richiedono un utente autenticato
     public class IngredientController : ControllerBase
     {
         // Il repository gestisce tutte le operazioni sul database degli ingredienti
@@ -35,7 +36,7 @@ namespace PizzaWebApi.Controllers
         // È accessibile a utenti REGULAR, SUPERVISOR e ADMIN
         // Viene chiamato quando si fa una richiesta GET a /Ingredient
         [HttpGet]
-        [Authorize(Roles = "REGULAR,SUPERVISOR,ADMIN")]
+        //[Authorize(Roles = "REGULAR,SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Get()
         {
             try
@@ -120,7 +121,7 @@ namespace PizzaWebApi.Controllers
         // - Validazione del modello
         // - Gestione completa degli errori
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Update(int id, [FromBody] Ingredient ingredient)
         {
             try
@@ -203,7 +204,7 @@ namespace PizzaWebApi.Controllers
 
         // Il tuo codice qui...
         [HttpPost]
-        [Authorize(Roles = "SUPERVISOR,ADMIN")]
+        //[Authorize(Roles = "SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Create([FromBody] Ingredient newIngredient)
         {
             try
@@ -213,7 +214,7 @@ namespace PizzaWebApi.Controllers
 
                 newIngredient.Id = 0;
                 var result = await _ingredientRepository.InsertIngredient(newIngredient);
-                return Created($"/Ingredient/{result.Id}", result);
+                return Created($"/Ingredient/{newIngredient.Id}", newIngredient);
             }
             catch (Exception e)
             {

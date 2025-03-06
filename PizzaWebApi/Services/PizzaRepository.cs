@@ -26,9 +26,9 @@ namespace PizzaWebApi
             var query = @$"SELECT {(limit == null ? "" : $"TOP {limit}")} p.*, c.Id AS CategoryId, c.Name AS CategoryName,
                                  i.Id AS IngredientId, i.Name AS IngredientName
                         FROM Pizzas p
-                        LEFT JOIN Categories c ON p.CategoryId = c.Id
-                        LEFT JOIN PizzaIngredient pi ON p.Id = pi.PizzaId
-                        LEFT JOIN Ingredients i ON pi.IngredientId = i.Id";
+                        LEFT JOIN Categories c ON p.Id = c.Id
+                        LEFT JOIN PizzaIngredient pi ON p.Id = pi.Id
+                        LEFT JOIN Ingredients i ON pi.Id = i.Id";
 
             // Apre una connessione al database
             using var conn = new SqlConnection(CONNECTION_STRING);
@@ -202,6 +202,9 @@ namespace PizzaWebApi
             }
         }
 
+        //Task aggiuntivi per risolvere errori nel codice
+
+        //Aggiunto HandleIngredients
         private async Task HandleIngredients(List<int> ingredientIds, int pizzaId, SqlConnection conn)
         {
             var deleteQuery = "DELETE FROM PizzaIngredient WHERE PizzaId = @pizzaId";
@@ -221,6 +224,83 @@ namespace PizzaWebApi
                     await insertCmd.ExecuteNonQueryAsync();
                 }
             }
+        }
+
+        //Aggiunto GetPizzaFromData
+        private Pizza GetPizzaFromData(SqlDataReader reader, Dictionary<int, Pizza> Pizzas)
+        {
+            int id = reader.GetInt32(reader.GetOrdinal("id"));
+            string name = reader.GetString(reader.GetOrdinal("name"));
+            var Pizza = new Pizza();
+            return Pizza;
+        }
+
+        //Aggiunto ClearCategoryRelations
+        public async Task<int> ClearCategoryRelations(int id)
+        {
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            var query = "DELETE FROM PizzaIngredient WHERE PizzaId = @id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@id", id));
+                return await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        //Aggiunto DeletePizza
+        public async Task<bool> DeletePizza(int id)
+        {
+            var clearedRelations = await ClearCategoryRelations(id);
+
+            if (clearedRelations > 0)
+            {
+                using var conn = new SqlConnection(CONNECTION_STRING);
+                await conn.OpenAsync();
+
+                var query = "DELETE FROM Pizzas WHERE Id = @id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    return rowsAffected > 0;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //Aggiunto GetPizzaById
+        public async Task<Pizza> GetPizzaById(int id)
+        {
+            var query = @"SELECT TOP 1 p.*, c.Id AS CategoryId, c.Name AS CategoryName, 
+                                 i.Id AS IngredientId, i.Name AS IngredientName
+                          FROM Pizzas p
+                          LEFT JOIN Categories c ON p.CategoryId = c.Id
+                          LEFT JOIN PizzaIngredient pi ON p.Id = pi.PizzaId
+                          LEFT JOIN Ingredients i ON pi.IngredientId = i.Id
+                          WHERE p.Id = @id";
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@id", id));
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    Dictionary<int, Pizza> Pizzas = new Dictionary<int, Pizza>();
+                    if (await reader.ReadAsync())
+                    {
+                        GetPizzaFromData(reader, Pizzas);
+                        return Pizzas.Values.FirstOrDefault();
+                    }
+                }
+            }
+            return null;
         }
     }
 }
