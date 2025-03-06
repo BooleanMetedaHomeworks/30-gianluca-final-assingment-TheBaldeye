@@ -207,12 +207,12 @@ namespace PizzaWebApi
         //Aggiunto InsertIngredient
         public async Task<int> InsertIngredient(Ingredient newIngredient)
         {
-            using var conn = new SqlConnection(IngredientRepository.CONNECTION_STRING);
+            using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
-            var query = $"INSERT INTO Categories (Id) VALUES (@Id)";
+            var query = $"INSERT INTO Ingredients (Name) VALUES (@Name)";
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                cmd.Parameters.Add(new SqlParameter("@Id", newIngredient.Id));
+                cmd.Parameters.Add(new SqlParameter("@Name", newIngredient.Name));
                 return await cmd.ExecuteNonQueryAsync();
             }
         }

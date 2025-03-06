@@ -27,7 +27,7 @@ namespace PizzaWebApi
                                  i.Id AS IngredientId, i.Name AS IngredientName
                         FROM Pizzas p
                         LEFT JOIN Categories c ON p.Id = c.Id
-                        LEFT JOIN PizzaIngredient pi ON p.Id = pi.Id
+                        LEFT JOIN PizzaIngredients pi ON p.Id = pi.Id
                         LEFT JOIN Ingredients i ON pi.Id = i.Id";
 
             // Apre una connessione al database
@@ -90,7 +90,7 @@ namespace PizzaWebApi
                                  i.Id AS IngredientId, i.Name AS IngredientName
                                  FROM Pizzas p
                                  LEFT JOIN Categories c ON p.CategoryId = c.Id
-                                 LEFT JOIN PizzaIngredient pi ON p.Id = pi.PizzaId
+                                 LEFT JOIN PizzaIngredients pi ON p.Id = pi.PizzaId
                                  LEFT JOIN Ingredients i ON pi.IngredientId = i.Id
                           WHERE p.name=@name";
             using var conn = new SqlConnection(CONNECTION_STRING);
@@ -207,20 +207,20 @@ namespace PizzaWebApi
         //Aggiunto HandleIngredients
         private async Task HandleIngredients(List<int> ingredientIds, int pizzaId, SqlConnection conn)
         {
-            var deleteQuery = "DELETE FROM PizzaIngredient WHERE PizzaId = @pizzaId";
+            var deleteQuery = "DELETE FROM PizzaIngredients WHERE PizzaId = @pizzaId";
             using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn))
             {
-                deleteCmd.Parameters.Add(new SqlParameter("@pizzaId", pizzaId));
+                deleteCmd.Parameters.Add(new SqlParameter("@PizzaId", pizzaId));
                 await deleteCmd.ExecuteNonQueryAsync();
             }
 
-            var insertQuery = "INSERT INTO PizzaIngredient (PizzaId, IngredientId) VALUES (@pizzaId, @ingredientId)";
+            var insertQuery = "INSERT INTO PizzaIngredients (PizzaId, IngredientId) VALUES (@PizzaId, @IngredientId)";
             foreach (var ingredientId in ingredientIds)
             {
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                 {
-                    insertCmd.Parameters.Add(new SqlParameter("@pizzaId", pizzaId));
-                    insertCmd.Parameters.Add(new SqlParameter("@ingredientId", ingredientId));
+                    insertCmd.Parameters.Add(new SqlParameter("@PizzaId", pizzaId));
+                    insertCmd.Parameters.Add(new SqlParameter("@IngredientId", ingredientId));
                     await insertCmd.ExecuteNonQueryAsync();
                 }
             }
@@ -241,7 +241,7 @@ namespace PizzaWebApi
             using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
 
-            var query = "DELETE FROM PizzaIngredient WHERE PizzaId = @id";
+            var query = "DELETE FROM PizzaIngredients WHERE PizzaId = @id";
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -282,7 +282,7 @@ namespace PizzaWebApi
                                  i.Id AS IngredientId, i.Name AS IngredientName
                           FROM Pizzas p
                           LEFT JOIN Categories c ON p.CategoryId = c.Id
-                          LEFT JOIN PizzaIngredient pi ON p.Id = pi.PizzaId
+                          LEFT JOIN PizzaIngredients pi ON p.Id = pi.PizzaId
                           LEFT JOIN Ingredients i ON pi.IngredientId = i.Id
                           WHERE p.Id = @id";
             using var conn = new SqlConnection(CONNECTION_STRING);

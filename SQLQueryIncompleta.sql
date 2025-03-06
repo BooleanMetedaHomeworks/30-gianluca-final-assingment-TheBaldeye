@@ -1,17 +1,14 @@
-﻿
-CREATE TABLE Pizzas (
+﻿CREATE TABLE Pizzas (
     Id INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(50) NOT NULL,
     Description NVARCHAR(255),
     Price DECIMAL(5,2) NOT NULL
 );
 
-
 CREATE TABLE Ingredients (
     Id INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(50) NOT NULL
 );
-
 
 CREATE TABLE PizzaIngredients (
     PizzaId INT NOT NULL,
@@ -21,11 +18,10 @@ CREATE TABLE PizzaIngredients (
     FOREIGN KEY (IngredientId) REFERENCES Ingredients(Id)
 );
 
-
 CREATE TABLE Users (
-Id int PRIMARY KEY identity (1, 1) NOT NULL,
-Email NVARCHAR(50) NOT NULL unique,
-PasswordHash NVARCHAR(255) NOT NULL
+    Id int PRIMARY KEY identity (1, 1) NOT NULL,
+    Email NVARCHAR(50) NOT NULL unique,
+    PasswordHash NVARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Roles (
@@ -39,12 +35,16 @@ CREATE TABLE UserRoles (
     PRIMARY KEY (UserId, RoleId),         
     FOREIGN KEY (UserId) REFERENCES Users(Id),   
     FOREIGN KEY (RoleId) REFERENCES Roles(Id)  
-    )  
+);
+
+CREATE TABLE Categories (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(50) NOT NULL UNIQUE
+);
 
 INSERT INTO Pizzas (Name, Description, Price) VALUES ('Margherita', 'La classica delle classiche', 7.99);
 INSERT INTO Pizzas (Name, Description, Price) VALUES ('Diavola', 'La classica ma con quel qualcosa in più', 8.99);
 INSERT INTO Pizzas (Name, Description, Price) VALUES ('Vegetariana', 'Per chi non mangia carne', 9.49);
-
 
 INSERT INTO Ingredients (Name) VALUES ('Salsa di pomodoro');
 INSERT INTO Ingredients (Name) VALUES ('Mozzarella');
@@ -64,4 +64,4 @@ INSERT INTO Roles (Name) VALUES ('Admin');
 INSERT INTO Roles (Name) VALUES ('User');
 
 INSERT INTO UserRoles (UserId, RoleId) VALUES (1, 1);  
-INSERT INTO UserRoles (UserId, RoleId) VALUES (1, 2);  
+INSERT INTO UserRoles (UserId, RoleId) VALUES (1, 2);
