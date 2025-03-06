@@ -187,20 +187,15 @@ namespace PizzaWebApi.Controllers
         {
             try
             {
-                if (ModelState.IsValid == false)
-                {
-                    return BadRequest(ModelState.Values);
-                }
                 var affectedRows = await _pizzaRepository.DeletePizza(id);
                 if (affectedRows == 0)
-                {
                     return NotFound();
-                }
+                return Ok(new { DeletedPizzas = affectedRows });
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
-        }
+        }   
     }
 }

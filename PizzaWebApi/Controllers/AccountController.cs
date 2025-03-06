@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PizzaWebApi.Models;
 using PizzaWebApi.Services;
 
@@ -125,9 +126,9 @@ namespace PizzaWebApi.Controllers
         // Il tuo codice qui...
         [HttpPost("Logout")]
         [Authorize]
-        public async Task<IActionResult> Logout([FromBody] UserModel user)
+        public IActionResult Logout()
         {
-            return Ok(new { message = "Logout effettuato." });
-        }
+            return Ok(new { message = "Logout effettuato con successo!" });
+        }  
     }
 }

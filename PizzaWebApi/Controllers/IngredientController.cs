@@ -202,28 +202,23 @@ namespace PizzaWebApi.Controllers
         // 7. Gestisci gli errori con try-catch
 
         // Il tuo codice qui...
-        [HttpPost("{id}")]
-        [Authorize(Roles = "SUPERVISOR, ADMIN")]
+        [HttpPost]
+        [Authorize(Roles = "SUPERVISOR,ADMIN")]
         public async Task<IActionResult> Create([FromBody] Ingredient newIngredient)
         {
             try
-            {               
+            {
                 if (!ModelState.IsValid)
-                {
                     return BadRequest(ModelState.Values);
-                }
-                
+
                 newIngredient.Id = 0;
-
                 var result = await _ingredientRepository.InsertIngredient(newIngredient);
-
-                return Created($"/{ControllerContext.ActionDescriptor.ControllerName}/{newIngredient.Id}", newIngredient);
+                return Created($"/Ingredient/{result.Id}", result);
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
         }
-
     }
 }
