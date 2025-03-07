@@ -19,27 +19,19 @@ namespace PizzaWebApi
         // Il parametro limit è opzionale (può essere null) e limita il numero di risultati
         public async Task<List<Pizza>> GetAllPizzas(int? limit = null)
         {
-            // Query SQL che recupera i dati delle pizze e le relative informazioni
-            // Usa dei JOIN per collegare le tabelle e ottenere:
-            // - Informazioni della categoria associata
-            // - Lista degli ingredienti di ogni pizza
-            var query = @$"SELECT {(limit == null ? "" : $"TOP {limit}")} p.*, c.Id AS CategoryId, c.Name AS CategoryName,
-                                 i.Id AS IngredientId, i.Name AS IngredientName
-                        FROM Pizzas p
-                        LEFT JOIN Categories c ON p.Id = c.Id
-                        LEFT JOIN PizzaIngredients pi ON p.Id = pi.Id
-                        LEFT JOIN Ingredients i ON pi.Id = i.Id";
+            var query = @$"SELECT {(limit == null ? "" : $"TOP {limit}")} p.Id, p.Name, p.Description, p.Price, 
+                                  c.Id AS CategoryId, c.Name AS CategoryName,
+                                  i.Id AS IngredientId, i.Name AS IngredientName
+                           FROM Pizzas p
+                           LEFT JOIN Categories c ON p.CategoryId = c.Id
+                           LEFT JOIN PizzaIngredients pi ON p.Id = pi.PizzaId
+                           LEFT JOIN Ingredients i ON pi.IngredientId = i.Id";
 
-            // Apre una connessione al database
             using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
 
-            // Dizionario per tenere traccia delle pizze già create
-            // Chiave: ID della pizza
-            // Valore: oggetto Pizza corrispondente
             Dictionary<int, Pizza> Pizzas = new Dictionary<int, Pizza>();
 
-            // Esegue la query e processa i risultati
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
@@ -51,7 +43,6 @@ namespace PizzaWebApi
                 }
             }
 
-            // Restituisce la lista di tutte le pizze trovate
             return Pizzas.Values.ToList();
         }
 
@@ -86,13 +77,14 @@ namespace PizzaWebApi
         //B)
         public async Task<List<Pizza>> GetPizzasByName(string name)
         {
-            var query = @"SELECT p.*, c.Id AS CategoryId, c.Name AS CategoryName, 
+            var query = @"SELECT p.Id, p.Name, p.Description, p.Price, 
+                                 c.Id AS CategoryId, c.Name AS CategoryName,
                                  i.Id AS IngredientId, i.Name AS IngredientName
-                                 FROM Pizzas p
-                                 LEFT JOIN Categories c ON p.CategoryId = c.Id
-                                 LEFT JOIN PizzaIngredients pi ON p.Id = pi.PizzaId
-                                 LEFT JOIN Ingredients i ON pi.IngredientId = i.Id
-                          WHERE p.name=@name";
+                          FROM Pizzas p
+                          LEFT JOIN Categories c ON p.CategoryId = c.Id
+                          LEFT JOIN PizzaIngredients pi ON p.Id = pi.PizzaId
+                          LEFT JOIN Ingredients i ON pi.IngredientId = i.Id
+                          WHERE p.Name = @name";
             using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
             Dictionary<int, Pizza> Pizzas = new Dictionary<int, Pizza>();
@@ -193,11 +185,11 @@ namespace PizzaWebApi
                 cmd.Parameters.Add(new SqlParameter("@price", pizza.Price));
                 cmd.Parameters.Add(new SqlParameter("@categoryId", pizza.CategoryId ?? (object)DBNull.Value));
                 cmd.Parameters.Add(new SqlParameter("@Id", pizza.Id));
-                
+
                 int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                 await HandleIngredients(pizza.IngredientIds, pizza.Id, conn);
-                
+
                 return rowsAffected;
             }
         }
@@ -207,13 +199,7 @@ namespace PizzaWebApi
         //Aggiunto HandleIngredients
         private async Task HandleIngredients(List<int> ingredientIds, int pizzaId, SqlConnection conn)
         {
-            var deleteQuery = "DELETE FROM PizzaIngredients WHERE PizzaId = @pizzaId";
-            using (SqlCommand deleteCmd = new SqlCommand(deleteQuery, conn))
-            {
-                deleteCmd.Parameters.Add(new SqlParameter("@PizzaId", pizzaId));
-                await deleteCmd.ExecuteNonQueryAsync();
-            }
-
+            await ClearCategoryRelations(pizzaId);
             var insertQuery = "INSERT INTO PizzaIngredients (PizzaId, IngredientId) VALUES (@PizzaId, @IngredientId)";
             foreach (var ingredientId in ingredientIds)
             {
@@ -231,8 +217,19 @@ namespace PizzaWebApi
         {
             int id = reader.GetInt32(reader.GetOrdinal("id"));
             string name = reader.GetString(reader.GetOrdinal("name"));
-            var Pizza = new Pizza();
-            return Pizza;
+            string description = reader.GetString(reader.GetOrdinal("description"));
+            decimal price = reader.GetDecimal(reader.GetOrdinal("price"));
+            if (Pizzas.TryGetValue(id, out Pizza pizza) == false) 
+            {
+                pizza = new Pizza(id, name, description, price);
+                Pizzas.Add(id, pizza);
+            }
+            if (reader.IsDBNull(reader.GetOrdinal("CategoryId")) == false) 
+            {
+                var CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId"));
+                Pizzas[id].CategoryId = CategoryId;
+            }
+            return Pizzas[id];
         }
 
         //Aggiunto ClearCategoryRelations
@@ -252,33 +249,27 @@ namespace PizzaWebApi
         //Aggiunto DeletePizza
         public async Task<bool> DeletePizza(int id)
         {
-            var clearedRelations = await ClearCategoryRelations(id);
 
-            if (clearedRelations > 0)
+            await ClearCategoryRelations(id);
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            var query = "DELETE FROM Pizzas WHERE Id = @id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                using var conn = new SqlConnection(CONNECTION_STRING);
-                await conn.OpenAsync();
+                cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                var query = "DELETE FROM Pizzas WHERE Id = @id";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                    return rowsAffected > 0;
-                }
-            }
-            else
-            {
-                return false;
+                return rowsAffected > 0;
             }
         }
 
         //Aggiunto GetPizzaById
         public async Task<Pizza> GetPizzaById(int id)
         {
-            var query = @"SELECT TOP 1 p.*, c.Id AS CategoryId, c.Name AS CategoryName, 
+            var query = @"SELECT p.Id, p.Name, p.Description, p.Price, 
+                                 c.Id AS CategoryId, c.Name AS CategoryName, 
                                  i.Id AS IngredientId, i.Name AS IngredientName
                           FROM Pizzas p
                           LEFT JOIN Categories c ON p.CategoryId = c.Id

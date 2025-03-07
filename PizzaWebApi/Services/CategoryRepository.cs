@@ -176,26 +176,19 @@ namespace PizzaWebApi
         //Aggiunta Delete per  Id Categoria
         public async Task<bool> DeleteCategoryById(int id)
         {
-            var clearedRelations = await _pizzaRepo.ClearCategoryRelations(id);
+            await _pizzaRepo.ClearCategoryRelations(id);
+            
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
 
-            if (clearedRelations > 0)
+            var query = "DELETE FROM Categories WHERE Id = @id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                using var conn = new SqlConnection(CONNECTION_STRING);
-                await conn.OpenAsync();
+                cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                var query = "DELETE FROM Categories WHERE Id = @id";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                    return rowsAffected > 0;
-                }
-            }
-            else
-            {
-                return false;
+                return rowsAffected > 0;
             }
         }
     }

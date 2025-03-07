@@ -221,5 +221,22 @@ namespace PizzaWebApi.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpDelete("{id}")]
+        //[Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> DeleteById(int id)
+        {
+            try
+            {
+                var result = await _ingredientRepository.DeleteIngredient(id);
+                if (!result)
+                    return NotFound();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

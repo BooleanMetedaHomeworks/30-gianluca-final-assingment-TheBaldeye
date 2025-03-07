@@ -156,31 +156,39 @@ namespace PizzaWebApi
         // Il tuo codice qui...
         public async Task<bool> DeleteIngredient(int id)
         {
-            var clearedRelations = await ClearPostIngredients(id);
+            await ClearPostIngredients(id);
 
-            if (clearedRelations > 0)
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            var query = "DELETE FROM Ingredients WHERE Id = @id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                using var conn = new SqlConnection(CONNECTION_STRING);
-                await conn.OpenAsync();
+                cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                var query = "DELETE FROM Ingredients WHERE Id = @id";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                    return rowsAffected > 0;
-                }
+                return rowsAffected > 0;
             }
-            else
+        }
+
+        // Metodo helper che rimuove tutte le relazioni di un ingrediente
+        private async Task<int> ClearPostIngredients(int id)
+        {
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            var query = $"DELETE FROM PizzaIngredients WHERE IngredientId = @id";  //stringa originale Andrevar:
+                                                                                   //query = $"DELETE FROM PostIngredient
+                                                                                   //WHERE IngredientId = @id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                return false;
+                cmd.Parameters.Add(new SqlParameter("@id", id));
+                return await cmd.ExecuteNonQueryAsync();
             }
         }
 
         //Task aggiuntivi per risolvere errori nel codice
-
         //Aggiunto GetIngredientFromData
         private Ingredient GetIngredientFromData(SqlDataReader reader)
         {
@@ -188,20 +196,6 @@ namespace PizzaWebApi
             var name = reader.GetString(reader.GetOrdinal("Name"));
             var ingredient = new Ingredient(id, name);
             return ingredient;
-        }
-
-        //Aggiunto ClearPostIngredients
-        private async Task<int> ClearPostIngredients(int id)
-        {
-            using var conn = new SqlConnection(CONNECTION_STRING);
-            await conn.OpenAsync();
-
-            var query = $"DELETE FROM PostIngredient WHERE IngredientId = @id";
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            {
-                cmd.Parameters.Add(new SqlParameter("@id", id));
-                return await cmd.ExecuteNonQueryAsync();
-            }
         }
 
         //Aggiunto InsertIngredient
